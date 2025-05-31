@@ -1,0 +1,186 @@
+/* ===================================
+   TYPOGRAPHY SYSTEM - GOOGLE FONTS
+   =================================== */
+
+/* CSS Custom Properties untuk Font Families */
+:root {
+    --font-primary: "Inter", sans-serif;          /* Font utama untuk body text */
+    --font-secondary: "Poppins", sans-serif;      /* Font untuk heading */
+    --font-accent: "Geologica", sans-serif;       /* Font accent/special */
+    --font-display: "Montserrat", sans-serif;     /* Font untuk display/hero */
+    --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  
+  /* ===================================
+     BASE TYPOGRAPHY
+     =================================== */
+  
+  /* Reset dan base styling */
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    font-size: 16px; /* Base font size */
+    line-height: 1.6;
+  }
+  
+  body {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* ===================================
+     FONT FAMILY UTILITIES
+     =================================== */
+  
+  .font-primary { font-family: var(--font-primary); }
+  .font-secondary { font-family: var(--font-secondary); }
+  .font-accent { font-family: var(--font-accent); }
+  .font-display { font-family: var(--font-display); }
+  .font-system { font-family: var(--font-system); }
+  
+  /* ===================================
+     FONT WEIGHT UTILITIES
+     =================================== */
+  
+  .font-light { font-weight: 300; }
+  .font-normal { font-weight: 400; }
+  .font-medium { font-weight: 500; }
+  .font-semibold { font-weight: 600; }
+  .font-bold { font-weight: 700; }
+  .font-extrabold { font-weight: 800; }
+  .font-black { font-weight: 900; }
+  
+  /* ===================================
+     HEADINGS SYSTEM
+     =================================== */
+  
+  h1, .h1 {
+    font-family: var(--font-secondary);
+    font-size: 2.5rem;    /* 40px */
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+  
+  h2, .h2 {
+    font-family: var(--font-secondary);
+    font-size: 2rem;      /* 32px */
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 0.875rem;
+  }
+  
+  h3, .h3 {
+    font-family: var(--font-secondary);
+    font-size: 1.5rem;    /* 24px */
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+  }
+  
+  h4, .h4 {
+    font-family: var(--font-primary);
+    font-size: 1.25rem;   /* 20px */
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 0.625rem;
+  }
+  
+  h5, .h5 {
+    font-family: var(--font-primary);
+    font-size: 1.125rem;  /* 18px */
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  
+  h6, .h6 {
+    font-family: var(--font-primary);
+    font-size: 1rem;      /* 16px */
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* ===================================
+     TEXT SIZE UTILITIES
+     =================================== */
+  
+  .text-xs { font-size: 0.75rem; line-height: 1.4; }      /* 12px */
+  .text-sm { font-size: 0.875rem; line-height: 1.5; }     /* 14px */
+  .text-base { font-size: 1rem; line-height: 1.6; }       /* 16px */
+  .text-lg { font-size: 1.125rem; line-height: 1.6; }     /* 18px */
+  .text-xl { font-size: 1.25rem; line-height: 1.5; }      /* 20px */
+  .text-2xl { font-size: 1.5rem; line-height: 1.4; }      /* 24px */
+  .text-3xl { font-size: 1.875rem; line-height: 1.3; }    /* 30px */
+  .text-4xl { font-size: 2.25rem; line-height: 1.2; }     /* 36px */
+  .text-5xl { font-size: 3rem; line-height: 1.1; }        /* 48px */
+  
+  /* ===================================
+     SPECIAL TYPOGRAPHY CLASSES
+     =================================== */
+  
+  /* Hero/Display text */
+  .text-hero {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  
+  /* Subtitle */
+  .text-subtitle {
+    font-family: var(--font-primary);
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: #666;
+    line-height: 1.6;
+  }
+  
+  /* Lead text */
+  .text-lead {
+    font-family: var(--font-primary);
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.7;
+  }
+  
+  /* Caption */
+  .text-caption {
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #666;
+    line-height: 1.4;
+  }
+  
+  /* Button text */
+  .text-button {
+    font-family: var(--font-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+  }
+  
+  /* ===================================
+     RESPONSIVE TYPOGRAPHY
+     =================================== */
+  
+  @media (max-width: 768px) {
+    html { font-size: 14px; }
+    
+    h1, .h1 { font-size: 2rem; }
+    h2, .h2 { font-size: 1.75rem; }
+    h3, .h3 { font-size: 1.375rem; }
+    
+    .text-hero {
+      font-size: clamp(2rem, 8vw, 2.5rem);
+    }
+  }

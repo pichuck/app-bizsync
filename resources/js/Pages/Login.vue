@@ -17,6 +17,13 @@
                                         class="avatar"
                                     />
                                 </div>
+                                <div
+                                    class="flex justify-center items-center m-0 geologica-bold"
+                                >
+                                    <span class="text-[#187e8b]"
+                                        >Finance Management System ©</span
+                                    >
+                                </div>
                                 <div class="input-control">
                                     <input
                                         type="text"
@@ -59,4 +66,18 @@
     </section>
 </template>
 
-<script></script>
+<script>
+// Import Font component untuk memuat styling
+import FontComponent from "@/Components/Font.vue";
+
+export default {
+    name: "LoginPage",
+    components: {
+        FontComponent,
+    },
+};
+</script>
+
+<style scoped>
+/* Style khusus untuk halaman login jika diperlukan */
+</style>

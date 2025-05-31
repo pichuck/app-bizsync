@@ -1,3 +1,10 @@
+/* Main CSS File */
+@import 'Typography.css';
+
+/* Atau jika menggunakan Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Import typography setelah base */
+@import 'Typography.css';

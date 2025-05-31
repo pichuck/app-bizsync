@@ -1,13 +1,19 @@
 <?php
 
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+// Halaman pertama yang muncul (root)
+Route::redirect('/', '/login-finance');
 
-
-Route::get('/', function () {
+// Halaman login baru
+Route::get('/login-finance', function () {
     return Inertia::render('Login');
-})->name('login');
+})->name('login-finance');
 
-// Route untuk halaman lain yang kamu butuhkan
+// Halaman dashboard
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+// ... rute lainnya
