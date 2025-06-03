@@ -4,19 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class DashboardController extends Controller
 {
-
-
-     use AuthorizesRequests;
-     
     public function superAdmin()
     {
-        $this->authorize('dashboard-super-admin');
+        // Cek role di dalam controller
+        if (!auth()->user()->hasRole('super-admin')) {
+            abort(403, 'Unauthorized access');
+        }
         
-        return Inertia::render('Dashboard/SuperAdmin', [
+        return Inertia::render('Dashboard/SuperAdmin/Index', [
             'user' => auth()->user(),
             'stats' => [
                 'total_users' => \App\Models\User::count(),
@@ -28,16 +26,22 @@ class DashboardController extends Controller
 
     public function admin()
     {
-        $this->authorize('dashboard-admin');
+        // Cek role di dalam controller - sesuaikan dengan yang di AuthController
+        if (!auth()->user()->hasRole('admin')) {
+            abort(403, 'Unauthorized access');
+        }
         
-        return Inertia::render('Dashboard/Admin', [
+        return Inertia::render('Dashboard/Admin/Index', [
             'user' => auth()->user(),
         ]);
     }
 
     public function inventory()
     {
-        $this->authorize('dashboard-inventory');
+        // Cek role di dalam controller - sesuaikan dengan yang di AuthController
+        if (!auth()->user()->hasRole('admin-inventory')) {
+            abort(403, 'Unauthorized access');
+        }
         
         return Inertia::render('Dashboard/Inventory/Index', [
             'user' => auth()->user(),
@@ -46,7 +50,10 @@ class DashboardController extends Controller
 
     public function finance()
     {
-        $this->authorize('dashboard-finance');
+        // Cek role di dalam controller - sesuaikan dengan yang di AuthController
+        if (!auth()->user()->hasRole('admin-finance')) {
+            abort(403, 'Unauthorized access');
+        }
         
         return Inertia::render('Dashboard/Finance/Index', [
             'user' => auth()->user(),
