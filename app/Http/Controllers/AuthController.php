@@ -33,16 +33,17 @@ class AuthController extends Controller
         if (Auth::attempt($loginData, $request->filled('remember'))) {
             $request->session()->regenerate();
             
-            $user = Auth::user();
+            // Force fresh user instance with roles loaded
+            $user = Auth::user()->fresh(['roles']);
             
-            // Redirect based on role
-            if ($user->hasRole('super-admin')) {
+            // Redirect based on role - menggunakan direct relationship check
+            if ($user->roles->contains('name', 'super-admin')) {
                 return redirect()->intended('/dashboard/super-admin');
-            } elseif ($user->hasRole('admin')) {
+            } elseif ($user->roles->contains('name', 'admin')) {
                 return redirect()->intended('/dashboard/admin');
-            } elseif ($user->hasRole('admin-inventory')) {
+            } elseif ($user->roles->contains('name', 'admin-inventory')) {
                 return redirect()->intended('/dashboard/inventory');
-            } elseif ($user->hasRole('admin-finance')) {
+            } elseif ($user->roles->contains('name', 'admin-finance')) {
                 return redirect()->intended('/dashboard/finance');
             }
             

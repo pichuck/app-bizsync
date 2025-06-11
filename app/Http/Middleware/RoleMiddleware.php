@@ -14,10 +14,12 @@ class RoleMiddleware
             return redirect('/login');
         }
 
-        $user = auth()->user();
+        // Load roles relationship untuk memastikan data ter-load
+        $user = auth()->user()->load('roles');
         
         foreach ($roles as $role) {
-            if ($user->hasRole($role)) {
+            // Gunakan relationship check yang konsisten
+            if ($user->roles->contains('name', $role)) {
                 return $next($request);
             }
         }
