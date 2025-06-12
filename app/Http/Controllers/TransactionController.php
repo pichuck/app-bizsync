@@ -59,7 +59,6 @@ class TransactionController extends Controller
             ]
         ];
 
-        // PERBAIKAN: Render ke component yang sama dengan DashboardController
         return Inertia::render('Dashboard/Finance/Transaksi', [
             'user' => $user,
             'transactions' => $transactions,
@@ -79,7 +78,8 @@ class TransactionController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        return Inertia::render('Dashboard/Finance/TransactionCreate', [
+        // FIXED: Updated to match the actual Vue file path
+        return Inertia::render('Dashboard/Finance/CRUDtransaksi/Create', [
             'user' => $user,
         ]);
     }
@@ -88,10 +88,14 @@ class TransactionController extends Controller
     {
         // Validasi dan simpan data
         $request->validate([
+            'date' => 'required|date',
+            'type' => 'required|in:sale,purchase,income,expense',
+            'contact_id' => 'nullable|integer',
             'description' => 'required|string|max:255',
             'total' => 'required|numeric|min:0',
-            'payment_method' => 'required|in:cash,transfer',
-            'status' => 'required|in:paid,unpaid',
+            'payment_method' => 'required|in:cash,credit',
+            'due_date' => 'nullable|date|after_or_equal:date',
+            'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         // Logic untuk menyimpan transaction ke database
@@ -112,14 +116,27 @@ class TransactionController extends Controller
         $transaction = [
             'id' => $id,
             'date' => '2024-06-10',
+            'type' => 'sale', // Tambahkan tipe transaksi
             'description' => 'Penjualan Produk A',
-            'contact' => ['name' => 'PT. Sukses Makmur'],
+            'contact' => ['name' => 'PT. Sukses Makmur', 'address' => 'Jl. Merdeka No. 123, Jakarta'],
+            'contact_id' => 5,
             'total' => 5000000,
             'payment_method' => 'cash',
             'status' => 'paid',
+            'created_at' => '2024-06-10 08:30:00',
+            'updated_at' => '2024-06-10 08:30:00',
+            // Tambahkan data dummy items jika dibutuhkan
+            'items' => [
+                [
+                    'description' => 'Produk A',
+                    'quantity' => 2,
+                    'price' => 2500000,
+                ]
+            ],
         ];
 
-        return Inertia::render('Dashboard/Finance/TransactionDetail', [
+        // PENTING: Ubah path render ke Read.vue
+        return Inertia::render('Dashboard/Finance/CRUDtransaksi/Read', [
             'user' => $user,
             'transaction' => $transaction,
         ]);
@@ -132,18 +149,22 @@ class TransactionController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        // Dummy data untuk edit transaction
+        // Dummy data untuk edit transaction (atau ambil dari database)
         $transaction = [
             'id' => $id,
             'date' => '2024-06-10',
+            'type' => 'sale',
             'description' => 'Penjualan Produk A',
-            'contact' => ['name' => 'PT. Sukses Makmur'],
+            'contact' => ['name' => 'PT. Sukses Makmur', 'id' => 5],
+            'contact_id' => 5,
             'total' => 5000000,
             'payment_method' => 'cash',
             'status' => 'paid',
+            'due_date' => null,
         ];
 
-        return Inertia::render('Dashboard/Finance/TransactionEdit', [
+        // PENTING: Pastikan path ini sesuai dengan lokasi file Update.vue
+        return Inertia::render('Dashboard/Finance/CRUDtransaksi/Update', [
             'user' => $user,
             'transaction' => $transaction,
         ]);
@@ -152,10 +173,13 @@ class TransactionController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'date' => 'required|date',
+            'type' => 'required|in:sale,purchase,income,expense',
+            'contact_id' => 'nullable|integer',
             'description' => 'required|string|max:255',
             'total' => 'required|numeric|min:0',
-            'payment_method' => 'required|in:cash,transfer',
-            'status' => 'required|in:paid,unpaid',
+            'payment_method' => 'required|in:cash,credit',
+            'due_date' => 'nullable|date|after_or_equal:date',
         ]);
 
         // Logic untuk update transaction

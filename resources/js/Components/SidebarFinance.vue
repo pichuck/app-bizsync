@@ -45,9 +45,11 @@
                         href="/dashboard/finance/transactions"
                         class="nav-link"
                         :class="{
-                            active:
-                                $page.component ===
+                            active: [
                                 'Dashboard/Finance/Transaksi',
+                                'Dashboard/Finance/CRUDtransaksi/Create',
+                                'Dashboard/Finance/CRUDtransaksi/Update', // Tambahkan ini
+                            ].includes($page.component),
                         }"
                     >
                         <i class="bi bi-arrow-left-right"></i>
@@ -69,24 +71,18 @@
                     </Link>
                 </li>
                 <li class="nav-item">
-                    <a
+                    <Link
+                        href="/dashboard/finance/suppliers"
                         class="nav-link"
-                        href="#"
-                        @click.prevent="showComingSoon('Pemasok')"
+                        :class="{
+                            active:
+                                $page.component ===
+                                'Dashboard/Finance/Supliers',
+                        }"
                     >
                         <i class="bi bi-truck"></i>
                         <span>Pemasok</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a
-                        class="nav-link"
-                        href="#"
-                        @click.prevent="showComingSoon('Laporan')"
-                    >
-                        <i class="bi bi-bar-chart-line"></i>
-                        <span>Laporan</span>
-                    </a>
+                    </Link>
                 </li>
             </ul>
         </nav>

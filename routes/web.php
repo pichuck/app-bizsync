@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SupplierController; // Tambahan import
 use Illuminate\Support\Facades\Route;
 
 // Guest routes
@@ -51,7 +52,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/dashboard/finance/transactions/{id}', [TransactionController::class, 'destroy'])
             ->name('finance.transactions.destroy');
         
-        // Customer routes - TAMBAHAN BARU
+        // Customer routes
         Route::get('/dashboard/finance/customers', [CustomerController::class, 'index'])
             ->name('finance.customers');
         Route::get('/dashboard/finance/customers/create', [CustomerController::class, 'create'])
@@ -66,6 +67,22 @@ Route::middleware('auth')->group(function () {
             ->name('customers.update');
         Route::delete('/dashboard/finance/customers/{id}', [CustomerController::class, 'destroy'])
             ->name('customers.destroy');
+
+        // Supplier routes - TAMBAHAN BARU
+        Route::get('/dashboard/finance/suppliers', [SupplierController::class, 'index'])
+            ->name('finance.suppliers');
+        Route::get('/dashboard/finance/suppliers/create', [SupplierController::class, 'create'])
+            ->name('suppliers.create');
+        Route::post('/dashboard/finance/suppliers', [SupplierController::class, 'store'])
+            ->name('suppliers.store');
+        Route::get('/dashboard/finance/suppliers/{id}', [SupplierController::class, 'show'])
+            ->name('suppliers.show');
+        Route::get('/dashboard/finance/suppliers/{id}/edit', [SupplierController::class, 'edit'])
+            ->name('suppliers.edit');
+        Route::put('/dashboard/finance/suppliers/{id}', [SupplierController::class, 'update'])
+            ->name('suppliers.update');
+        Route::delete('/dashboard/finance/suppliers/{id}', [SupplierController::class, 'destroy'])
+            ->name('suppliers.destroy');
     });
 });
 

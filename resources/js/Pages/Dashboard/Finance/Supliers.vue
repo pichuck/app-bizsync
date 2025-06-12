@@ -1,92 +1,44 @@
 <script>
 import DashboardFinanceLayouts from "@/Layouts/DashboardFinanceLayouts.vue";
-import { Link } from "@inertiajs/vue3";
 
 export default {
-    name: "Transaksi",
+    name: "Suppliers",
     components: {
         DashboardFinanceLayouts,
-        Link,
     },
     props: {
         user: {
             type: Object,
             required: true,
         },
-        transactions: {
+        suppliers: {
             type: Array,
             default: () => [],
-        },
-        summary: {
-            type: Object,
-            default: () => ({}),
         },
     },
     data() {
         return {
-            filterType: "",
             searchQuery: "",
-            dateFrom: "",
-            dateTo: "",
-            showFilters: false,
         };
     },
     computed: {
-        filteredTransactions() {
-            let filtered = this.transactions;
-
-            // Filter by type
-            if (this.filterType) {
-                filtered = filtered.filter(
-                    (trx) => trx.type === this.filterType
-                );
-            }
+        filteredSuppliers() {
+            let filtered = this.suppliers;
 
             // Filter by search query
             if (this.searchQuery) {
                 const query = this.searchQuery.toLowerCase();
                 filtered = filtered.filter(
-                    (trx) =>
-                        trx.description.toLowerCase().includes(query) ||
-                        (trx.contact?.name || "").toLowerCase().includes(query)
+                    (supplier) =>
+                        supplier.name.toLowerCase().includes(query) ||
+                        (supplier.contact || "").toLowerCase().includes(query)
                 );
-            }
-
-            // Filter by date range
-            if (this.dateFrom || this.dateTo) {
-                filtered = filtered.filter((trx) => {
-                    const trxDate = new Date(trx.date);
-                    const fromDate = this.dateFrom
-                        ? new Date(this.dateFrom)
-                        : null;
-                    const toDate = this.dateTo ? new Date(this.dateTo) : null;
-
-                    if (fromDate && trxDate < fromDate) return false;
-                    if (toDate && trxDate > toDate) return false;
-                    return true;
-                });
             }
 
             return filtered;
         },
-        hasActiveFilters() {
-            return (
-                this.filterType ||
-                this.searchQuery ||
-                this.dateFrom ||
-                this.dateTo
-            );
-        },
     },
     methods: {
-        formatDate(date) {
-            const d = new Date(date);
-            return d.toLocaleDateString("id-ID", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-            });
-        },
         formatRupiah(num) {
             return new Intl.NumberFormat("id-ID", {
                 style: "currency",
@@ -94,59 +46,26 @@ export default {
                 minimumFractionDigits: 0,
             }).format(num);
         },
-        getStatusBadge(transaction) {
-            if (transaction.payment_method === "cash") {
-                return { class: "bg-green-100 text-green-800", text: "Lunas" };
-            }
-            return transaction.status === "paid"
-                ? { class: "bg-green-100 text-green-800", text: "Lunas" }
-                : {
-                      class: "bg-yellow-100 text-yellow-800",
-                      text: "Belum Lunas",
-                  };
+        handleEdit(supplierId) {
+            // Navigate to edit page or emit event
+            this.$inertia.visit(
+                `/dashboard/finance/suppliers/${supplierId}/edit`
+            );
         },
-        getTypeLabel(type) {
-            const labels = {
-                sale: "Penjualan",
-                purchase: "Pembelian",
-                income: "Pendapatan",
-                expense: "Pengeluaran",
-            };
-            return labels[type] || type;
+        handleDetail(supplierId) {
+            // Navigate to detail page or emit event
+            this.$inertia.visit(`/dashboard/finance/suppliers/${supplierId}`);
         },
-        getTypeIcon(type) {
-            const icons = {
-                sale: "bi-cart-check",
-                purchase: "bi-bag",
-                income: "bi-arrow-up-circle",
-                expense: "bi-arrow-down-circle",
-            };
-            return icons[type] || "bi-receipt";
-        },
-        getTypeColor(type) {
-            const colors = {
-                sale: "bg-blue-100 text-blue-800",
-                purchase: "bg-purple-100 text-purple-800",
-                income: "bg-green-100 text-green-800",
-                expense: "bg-red-100 text-red-800",
-            };
-            return colors[type] || "bg-gray-100 text-gray-800";
-        },
-        clearFilters() {
-            this.filterType = "";
-            this.searchQuery = "";
-            this.dateFrom = "";
-            this.dateTo = "";
-        },
-        toggleFilters() {
-            this.showFilters = !this.showFilters;
-        },
-        confirmDelete(transactionId) {
-            if (confirm("Apakah Anda yakin ingin menghapus transaksi ini?")) {
+        handleDelete(supplierId) {
+            if (confirm("Yakin ingin menghapus pemasok ini?")) {
                 this.$inertia.delete(
-                    route("finance.transactions.destroy", transactionId)
+                    `/dashboard/finance/suppliers/${supplierId}`
                 );
             }
+        },
+        handleCreate() {
+            // Navigate to create page or emit event
+            this.$inertia.visit("/dashboard/finance/suppliers/create");
         },
     },
 };
@@ -162,30 +81,19 @@ export default {
                 >
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">
-                            Daftar Transaksi
+                            Daftar Pemasok
                         </h1>
                         <p class="text-gray-600 mt-1">
-                            Kelola dan pantau semua aktivitas keuangan bisnis
-                            Anda
+                            Kelola dan pantau informasi pemasok bisnis Anda
                         </p>
                     </div>
                     <div class="flex gap-3">
-                        <select
-                            v-model="filterType"
-                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        <button
+                            @click="handleCreate"
+                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                         >
-                            <option value="">-- Semua Jenis --</option>
-                            <option value="sale">Penjualan</option>
-                            <option value="purchase">Pembelian</option>
-                            <option value="income">Pendapatan</option>
-                            <option value="expense">Pengeluaran</option>
-                        </select>
-                        <Link
-                            :href="route('finance.transactions.create')"
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors inline-flex items-center"
-                        >
-                            + Tambah Transaksi
-                        </Link>
+                            + Tambah Pemasok
+                        </button>
                     </div>
                 </div>
             </div>
@@ -196,7 +104,7 @@ export default {
                     <input
                         v-model="searchQuery"
                         type="text"
-                        placeholder="Cari..."
+                        placeholder="Cari pemasok..."
                         class="w-full max-w-md px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <svg
@@ -215,7 +123,7 @@ export default {
                 </div>
             </div>
 
-            <!-- Transaction Table -->
+            <!-- Suppliers Table -->
             <div
                 class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
             >
@@ -226,30 +134,31 @@ export default {
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
-                                    Tanggal
+                                    Nama
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
-                                    Deskripsi
+                                    Kontak
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
-                                    Customer/Pemasok
+                                    Email
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
-                                    Total
+                                    Limit Kredit
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
-                                    Status
+                                    Total Utang
                                 </th>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    style="width: 180px"
                                 >
                                     Aksi
                                 </th>
@@ -257,62 +166,48 @@ export default {
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr
-                                v-for="trx in filteredTransactions"
-                                :key="trx.id"
+                                v-for="supplier in filteredSuppliers"
+                                :key="supplier.id"
                                 class="hover:bg-gray-50"
                             >
                                 <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
                                 >
-                                    {{ formatDate(trx.date) }}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-900">
-                                    <div class="flex items-center gap-2">
-                                        <span
-                                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                                            :class="getTypeColor(trx.type)"
-                                        >
-                                            {{ getTypeLabel(trx.type) }}
-                                        </span>
-                                        <span>{{ trx.description }}</span>
-                                    </div>
+                                    {{ supplier.name }}
                                 </td>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                 >
-                                    {{ trx.contact?.name || "-" }}
+                                    {{ supplier.contact || "-" }}
                                 </td>
                                 <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                                    :class="
-                                        ['sale', 'income'].includes(trx.type)
-                                            ? 'text-green-600'
-                                            : 'text-red-600'
-                                    "
+                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                                 >
-                                    {{ formatRupiah(trx.total) }}
+                                    {{ supplier.email || "-" }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                                        :class="getStatusBadge(trx).class"
-                                    >
-                                        {{ getStatusBadge(trx).text }}
-                                    </span>
+                                <td
+                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                >
+                                    {{
+                                        formatRupiah(supplier.credit_limit || 0)
+                                    }}
+                                </td>
+                                <td
+                                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                                >
+                                    {{
+                                        formatRupiah(
+                                            supplier.total_payables || 0
+                                        )
+                                    }}
                                 </td>
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                 >
                                     <div class="flex gap-2">
-                                        <!-- Detail Button -->
-                                        <Link
-                                            :href="
-                                                route(
-                                                    'finance.transactions.show',
-                                                    trx.id
-                                                )
-                                            "
-                                            class="text-blue-600 hover:text-blue-900 p-1 inline-flex items-center"
+                                        <button
+                                            @click="handleDetail(supplier.id)"
+                                            class="text-blue-600 hover:text-blue-900 p-1"
                                             title="Detail"
                                         >
                                             <svg
@@ -334,17 +229,10 @@ export default {
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                                                 ></path>
                                             </svg>
-                                        </Link>
-
-                                        <!-- Edit Button - UPDATED -->
-                                        <Link
-                                            :href="
-                                                route(
-                                                    'finance.transactions.edit',
-                                                    trx.id
-                                                )
-                                            "
-                                            class="text-yellow-600 hover:text-yellow-900 p-1 inline-flex items-center"
+                                        </button>
+                                        <button
+                                            @click="handleEdit(supplier.id)"
+                                            class="text-yellow-600 hover:text-yellow-900 p-1"
                                             title="Edit"
                                         >
                                             <svg
@@ -360,11 +248,9 @@ export default {
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                                                 ></path>
                                             </svg>
-                                        </Link>
-
-                                        <!-- Delete Button -->
+                                        </button>
                                         <button
-                                            @click="confirmDelete(trx.id)"
+                                            @click="handleDelete(supplier.id)"
                                             class="text-red-600 hover:text-red-900 p-1"
                                             title="Hapus"
                                         >
@@ -390,7 +276,7 @@ export default {
 
                     <!-- Empty State -->
                     <div
-                        v-if="filteredTransactions.length === 0"
+                        v-if="filteredSuppliers.length === 0"
                         class="text-center py-12"
                     >
                         <svg
@@ -403,22 +289,22 @@ export default {
                                 stroke-linecap="round"
                                 stroke-linejoin="round"
                                 stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                             ></path>
                         </svg>
                         <h3 class="mt-2 text-sm font-medium text-gray-900">
-                            Tidak ada transaksi.
+                            Tidak ada pemasok.
                         </h3>
                         <p class="mt-1 text-sm text-gray-500">
                             {{
-                                hasActiveFilters
-                                    ? "Coba ubah filter pencarian Anda"
-                                    : "Mulai dengan menambahkan transaksi pertama"
+                                searchQuery
+                                    ? "Coba ubah kata kunci pencarian Anda"
+                                    : "Mulai dengan menambahkan pemasok pertama"
                             }}
                         </p>
-                        <div class="mt-6" v-if="!hasActiveFilters">
-                            <Link
-                                :href="route('finance.transactions.create')"
+                        <div class="mt-6" v-if="!searchQuery">
+                            <button
+                                @click="handleCreate"
                                 class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
                             >
                                 <svg
@@ -434,8 +320,8 @@ export default {
                                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                                     ></path>
                                 </svg>
-                                Tambah Transaksi
-                            </Link>
+                                Tambah Pemasok
+                            </button>
                         </div>
                     </div>
                 </div>
