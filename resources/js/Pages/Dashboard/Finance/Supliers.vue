@@ -1,10 +1,12 @@
 <script>
 import DashboardFinanceLayouts from "@/Layouts/DashboardFinanceLayouts.vue";
+import { Link } from "@inertiajs/vue3";
 
 export default {
     name: "Suppliers",
     components: {
         DashboardFinanceLayouts,
+        Link,
     },
     props: {
         user: {
@@ -88,12 +90,25 @@ export default {
                         </p>
                     </div>
                     <div class="flex gap-3">
-                        <button
-                            @click="handleCreate"
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        <Link
+                            :href="route('finance.suppliers.create')"
+                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors inline-flex items-center"
                         >
-                            + Tambah Pemasok
-                        </button>
+                            <svg
+                                class="w-5 h-5 mr-2"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 4v16m8-8H4"
+                                ></path>
+                            </svg>
+                            Tambah Pemasok
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -205,8 +220,13 @@ export default {
                                     class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
                                 >
                                     <div class="flex gap-2">
-                                        <button
-                                            @click="handleDetail(supplier.id)"
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'finance.suppliers.show',
+                                                    supplier.id
+                                                )
+                                            "
                                             class="text-blue-600 hover:text-blue-900 p-1"
                                             title="Detail"
                                         >
@@ -229,9 +249,14 @@ export default {
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
                                                 ></path>
                                             </svg>
-                                        </button>
-                                        <button
-                                            @click="handleEdit(supplier.id)"
+                                        </Link>
+                                        <Link
+                                            :href="
+                                                route(
+                                                    'finance.suppliers.edit',
+                                                    supplier.id
+                                                )
+                                            "
                                             class="text-yellow-600 hover:text-yellow-900 p-1"
                                             title="Edit"
                                         >
@@ -248,7 +273,7 @@ export default {
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                                                 ></path>
                                             </svg>
-                                        </button>
+                                        </Link>
                                         <button
                                             @click="handleDelete(supplier.id)"
                                             class="text-red-600 hover:text-red-900 p-1"

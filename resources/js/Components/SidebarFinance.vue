@@ -78,9 +78,12 @@
                         href="/dashboard/finance/suppliers"
                         class="nav-link"
                         :class="{
-                            active:
-                                $page.component ===
+                            active: [
                                 'Dashboard/Finance/Supliers',
+                                'Dashboard/Finance/CRUDsupliers/Create',
+                                'Dashboard/Finance/CRUDsupliers/Update',
+                                'Dashboard/Finance/CRUDsupliers/Read',
+                            ].includes($page.component),
                         }"
                     >
                         <i class="bi bi-truck"></i>

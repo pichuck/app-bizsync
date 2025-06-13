@@ -82,8 +82,14 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Dashboard/Finance/Suppliers/Create', [
-            'user' => auth()->user()
+        // Validasi role admin-finance
+        $user = auth()->user()->load('roles');
+        if (!$user->roles->contains('name', 'admin-finance')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        return Inertia::render('Dashboard/Finance/CRUDsupliers/Create', [
+            'user' => $user
         ]);
     }
 
@@ -113,22 +119,58 @@ class SupplierController extends Controller
      */
     public function show($id)
     {
+        $user = auth()->user()->load('roles');
+        if (!$user->roles->contains('name', 'admin-finance')) {
+            abort(403, 'Unauthorized access');
+        }
+
         // Data dummy untuk detail supplier
         $supplier = [
             'id' => $id,
-            'name' => 'PT. Maju Jaya',
-            'contact' => '08123456789',
-            'email' => 'contact@majujaya.com',
-            'address' => 'Jl. Raya Industri No. 123, Jakarta',
-            'credit_limit' => 50000000,
-            'total_payables' => 15000000,
-            'created_at' => '2024-01-15',
-            'updated_at' => '2024-01-15'
+            'name' => 'PT. Supplier Jaya',
+            'email' => 'contact@supplierjaya.com',
+            'phone' => '021-1234567',
+            'address' => 'Jl. Industri No. 123, Jakarta',
+            'type' => 'manufacturer',
+            'pic_name' => 'Budi Santoso',
+            'pic_position' => 'Sales Manager',
+            'pic_phone' => '081234567890',
+            'tax_id' => '12.345.678.9-012.000',
+            'bank_account' => 'BCA - 1234567890 (a.n PT Supplier Jaya)',
+            'notes' => 'Supplier utama untuk bahan baku produksi',
+            'logo_url' => 'https://via.placeholder.com/150',
+            'status' => 'active',
+            'created_at' => '2023-01-15',
+            'updated_at' => '2024-05-20',
+            // Data transaksi dummy
+            'transactions' => [
+                [
+                    'id' => 201,
+                    'date' => '2024-05-15',
+                    'description' => 'Pembelian Bahan Baku',
+                    'reference_no' => 'PO-2024-001',
+                    'total' => 12500000,
+                    'status' => 'paid',
+                    'payment_method' => 'transfer'
+                ],
+                [
+                    'id' => 202,
+                    'date' => '2024-06-01',
+                    'description' => 'Pembelian Spare Part Mesin',
+                    'reference_no' => 'PO-2024-002',
+                    'total' => 8750000,
+                    'status' => 'unpaid',
+                    'payment_method' => 'credit'
+                ]
+            ],
+            // Data kategori produk dummy
+            'product_categories' => ['Bahan Baku', 'Spare Part', 'Packaging']
         ];
 
-        return Inertia::render('Dashboard/Finance/Suppliers/Show', [
+        // Ubah path render ke yang benar
+        return Inertia::render('Dashboard/Finance/CRUDsupliers/Read', [
             'supplier' => $supplier,
-            'user' => auth()->user()
+            'user' => $user,
         ]);
     }
 
@@ -137,22 +179,32 @@ class SupplierController extends Controller
      */
     public function edit($id)
     {
-        // Data dummy untuk edit supplier
+        $user = auth()->user()->load('roles');
+        if (!$user->roles->contains('name', 'admin-finance')) {
+            abort(403, 'Unauthorized access');
+        }
+        
+        // Dummy data untuk contoh - seharusnya diambil dari database
         $supplier = [
             'id' => $id,
-            'name' => 'PT. Maju Jaya',
-            'contact' => '08123456789',
-            'email' => 'contact@majujaya.com',
-            'address' => 'Jl. Raya Industri No. 123, Jakarta',
-            'credit_limit' => 50000000,
-            'total_payables' => 15000000,
-            'created_at' => '2024-01-15',
-            'updated_at' => '2024-01-15'
+            'name' => 'PT Supplier Jaya',
+            'email' => 'contact@supplierjaya.com',
+            'phone' => '021-1234567',
+            'address' => 'Jl. Industri No. 123, Jakarta',
+            'type' => 'manufacturer',
+            'pic_name' => 'Budi Santoso',
+            'pic_position' => 'Sales Manager',
+            'pic_phone' => '081234567890',
+            'tax_id' => '12.345.678.9-012.000',
+            'bank_account' => 'BCA - 1234567890 (a.n PT Supplier Jaya)',
+            'notes' => 'Supplier utama untuk bahan baku produksi',
+            'logo_url' => 'https://via.placeholder.com/150',
+            'status' => 'active',
         ];
-
-        return Inertia::render('Dashboard/Finance/Suppliers/Edit', [
+        
+        return Inertia::render('Dashboard/Finance/CRUDsupliers/Update', [
+            'user' => $user,
             'supplier' => $supplier,
-            'user' => auth()->user()
         ]);
     }
 
@@ -161,17 +213,23 @@ class SupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Validasi data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'contact' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'credit_limit' => 'nullable|numeric|min:0',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string',
+            'type' => 'required|string|in:manufacturer,distributor,retailer,service',
+            'pic_name' => 'nullable|string|max:255',
+            'pic_position' => 'nullable|string|max:255',
+            'pic_phone' => 'nullable|string|max:20',
+            'tax_id' => 'nullable|string|max:50',
+            'bank_account' => 'nullable|string|max:255',
+            'notes' => 'nullable|string',
+            'logo' => 'nullable|image|max:2048',
+            'status' => 'required|string|in:active,inactive',
         ]);
-
-        // Untuk saat ini hanya redirect dengan pesan sukses
-        // Nanti bisa ditambahkan logic untuk update ke database
+        
+        // Logic untuk update supplier
         
         return redirect()->route('finance.suppliers')
             ->with('success', 'Supplier berhasil diperbarui');

@@ -68,19 +68,19 @@ Route::middleware('auth')->group(function () {
         Route::delete('/dashboard/finance/customers/{id}', [CustomerController::class, 'destroy'])
             ->name('customers.destroy');
 
-        // Supplier routes - TAMBAHAN BARU
+        // Supplier routes - PERBAIKAN PENAMAAN ROUTE
         Route::get('/dashboard/finance/suppliers', [SupplierController::class, 'index'])
             ->name('finance.suppliers');
         Route::get('/dashboard/finance/suppliers/create', [SupplierController::class, 'create'])
-            ->name('suppliers.create');
+            ->name('finance.suppliers.create');  // Ubah menjadi lebih konsisten
         Route::post('/dashboard/finance/suppliers', [SupplierController::class, 'store'])
-            ->name('suppliers.store');
+            ->name('finance.suppliers.store');  // Ubah menjadi lebih konsisten
         Route::get('/dashboard/finance/suppliers/{id}', [SupplierController::class, 'show'])
-            ->name('suppliers.show');
+            ->name('finance.suppliers.show');
         Route::get('/dashboard/finance/suppliers/{id}/edit', [SupplierController::class, 'edit'])
-            ->name('suppliers.edit');
-        Route::put('/dashboard/finance/suppliers/{id}', [SupplierController::class, 'update'])
-            ->name('suppliers.update');
+            ->name('finance.suppliers.edit');
+        Route::post('/dashboard/finance/suppliers/{id}', [SupplierController::class, 'update'])
+            ->name('finance.suppliers.update');
         Route::delete('/dashboard/finance/suppliers/{id}', [SupplierController::class, 'destroy'])
             ->name('suppliers.destroy');
     });
