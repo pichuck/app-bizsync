@@ -59,9 +59,9 @@ class CustomerController extends Controller
             abort(403, 'Unauthorized access');
         }
         
-        return Inertia::render('Dashboard/Finance/CustomerForm', [
-            'user' => $user,
-            'customer' => null, // null untuk create mode
+        // Ubah path render sesuai dengan lokasi file Vue
+        return Inertia::render('Dashboard/Finance/CRUDcustomer/Create', [
+            'user' => $user
         ]);
     }
 
@@ -84,10 +84,46 @@ class CustomerController extends Controller
             abort(403, 'Unauthorized access');
         }
         
-        // Implement show logic here
-        return Inertia::render('Dashboard/Finance/CustomerDetail', [
+        // Data dummy customer untuk contoh
+        $customer = [
+            'id' => $id,
+            'name' => 'PT. ABC Corporation',
+            'contact' => '0812-3456-7890',
+            'email' => 'contact@abc-corp.com',
+            'address' => 'Jl. Sudirman No. 123, Jakarta',
+            'credit_limit' => 50000000,
+            'outstanding_balance' => 15000000,
+            'type' => 'company',
+            'status' => 'active',
+            'created_at' => '2023-01-15',
+            'updated_at' => '2024-05-20',
+            // Data transaksi dummy
+            'transactions' => [
+                [
+                    'id' => 101,
+                    'date' => '2024-05-15',
+                    'type' => 'sale',
+                    'description' => 'Penjualan Produk A',
+                    'total' => 5000000,
+                    'status' => 'paid',
+                    'payment_method' => 'credit'
+                ],
+                [
+                    'id' => 102,
+                    'date' => '2024-06-01',
+                    'type' => 'sale',
+                    'description' => 'Penjualan Produk B',
+                    'total' => 7500000,
+                    'status' => 'unpaid',
+                    'payment_method' => 'credit'
+                ]
+            ]
+        ];
+        
+        // Ubah path render ke Read.vue yang benar
+        return Inertia::render('Dashboard/Finance/CRUDcustomer/Read', [
             'user' => $user,
-            'customer' => ['id' => $id], // dummy data
+            'customer' => $customer,
         ]);
     }
 
@@ -98,10 +134,22 @@ class CustomerController extends Controller
             abort(403, 'Unauthorized access');
         }
         
-        // Implement edit logic here
-        return Inertia::render('Dashboard/Finance/CustomerForm', [
+        // Data dummy customer untuk contoh
+        $customer = [
+            'id' => $id,
+            'name' => 'PT. ABC Corporation',
+            'contact' => '0812-3456-7890',
+            'email' => 'contact@abc-corp.com',
+            'address' => 'Jl. Sudirman No. 123, Jakarta',
+            'credit_limit' => 50000000,
+            'type' => 'company',
+            'status' => 'active'
+        ];
+        
+        // Perbaiki path render ke Update.vue
+        return Inertia::render('Dashboard/Finance/CRUDcustomer/Update', [
             'user' => $user,
-            'customer' => ['id' => $id], // dummy data untuk edit mode
+            'customer' => $customer,
         ]);
     }
 
@@ -112,8 +160,30 @@ class CustomerController extends Controller
             abort(403, 'Unauthorized access');
         }
         
-        // Implement update logic here
-        return redirect()->route('finance.customers')->with('success', 'Customer berhasil diupdate');
+        // Validasi form
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'contact' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'address' => 'nullable|string',
+            'credit_limit' => 'nullable|numeric|min:0',
+            'type' => 'required|string|in:individual,company',
+            'status' => 'required|string|in:active,inactive',
+            'profile_image' => 'nullable|image|max:2048',
+        ]);
+        
+        // Di sini seharusnya ada logika update ke database
+        // Misalnya: Customer::find($id)->update($validated);
+        
+        // Jika ada upload gambar, bisa disimpan dengan:
+        if ($request->hasFile('profile_image')) {
+            // Logic untuk upload dan simpan image
+            // $path = $request->file('profile_image')->store('customers');
+            // $customer->update(['profile_image' => $path]);
+        }
+        
+        return redirect()->route('finance.customers')
+            ->with('success', 'Pelanggan berhasil diperbarui');
     }
 
     public function destroy($id)

@@ -56,15 +56,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard/finance/customers', [CustomerController::class, 'index'])
             ->name('finance.customers');
         Route::get('/dashboard/finance/customers/create', [CustomerController::class, 'create'])
-            ->name('customers.create');
+            ->name('finance.customers.create');  // Ubah dari "customers.create" menjadi "finance.customers.create"
         Route::post('/dashboard/finance/customers', [CustomerController::class, 'store'])
-            ->name('customers.store');
+            ->name('finance.customers.store');   // Ubah dari "customers.store" menjadi "finance.customers.store"
         Route::get('/dashboard/finance/customers/{id}', [CustomerController::class, 'show'])
-            ->name('customers.show');
+            ->name('finance.customers.show');  // Ubah dari 'customers.show' menjadi 'finance.customers.show'
         Route::get('/dashboard/finance/customers/{id}/edit', [CustomerController::class, 'edit'])
-            ->name('customers.edit');
+            ->name('finance.customers.edit');  // Ubah jadi finance.customers.edit
         Route::put('/dashboard/finance/customers/{id}', [CustomerController::class, 'update'])
-            ->name('customers.update');
+            ->name('finance.customers.update'); // Ubah jadi finance.customers.update
         Route::delete('/dashboard/finance/customers/{id}', [CustomerController::class, 'destroy'])
             ->name('customers.destroy');
 

@@ -48,7 +48,7 @@
                             active: [
                                 'Dashboard/Finance/Transaksi',
                                 'Dashboard/Finance/CRUDtransaksi/Create',
-                                'Dashboard/Finance/CRUDtransaksi/Update', // Tambahkan ini
+                                'Dashboard/Finance/CRUDtransaksi/Update',
                             ].includes($page.component),
                         }"
                     >
@@ -61,9 +61,12 @@
                         href="/dashboard/finance/customers"
                         class="nav-link"
                         :class="{
-                            active:
-                                $page.component ===
+                            active: [
                                 'Dashboard/Finance/Customers',
+                                'Dashboard/Finance/CRUDcustomer/Create',
+                                'Dashboard/Finance/CRUDcustomer/Update',
+                                'Dashboard/Finance/CRUDcustomer/Read',
+                            ].includes($page.component),
                         }"
                     >
                         <i class="bi bi-people"></i>
