@@ -193,6 +193,7 @@
 import { ref, reactive } from "vue";
 import DashboardFinanceLayouts from "@/Layouts/DashboardFinanceLayouts.vue";
 import { router } from "@inertiajs/vue3";
+import axios from "axios";
 
 // Form state
 const form = reactive({
@@ -210,21 +211,110 @@ const form = reactive({
     status: "active",
 });
 
+// UI states
+const contactQuery = ref("");
+const contactSuggestions = ref([]);
+const showDueDate = ref(false);
+const isSubmitting = ref(false);
+const errors = ref({});
+const isLoadingContacts = ref(false);
+
+// Computed properties
+const calculatedTotal = computed(() => {
+    return form.items.reduce((total, item) => {
+        return total + item.quantity * item.price;
+    }, 0);
+});
+
+// Watch for calculated total changes and update form total
+watch(calculatedTotal, (newTotal) => {
+    form.total = newTotal;
+});
+
+// Toggle due date visibility
+const toggleDueDate = () => {
+    showDueDate.value = form.payment_method === "credit";
+    if (!showDueDate.value) {
+        form.due_date = "";
+    }
+};
+
 // Handle file upload
 const handleFileUpload = (event) => {
     form.profile_image = event.target.files[0];
 };
 
+// Modifikasi function untuk contact input
+const fetchContacts = async () => {
+    if (contactQuery.value.length < 2 || !form.type) {
+        contactSuggestions.value = [];
+        return;
+    }
+
+    try {
+        isLoadingContacts.value = true;
+        // Coba gunakan API jika tersedia
+        const response = await axios.get("/api/contacts/search", {
+            params: {
+                type: form.type,
+                q: contactQuery.value,
+            },
+        });
+        contactSuggestions.value = response.data;
+    } catch (error) {
+        console.error("Error fetching contacts:", error);
+        contactSuggestions.value = [];
+    } finally {
+        isLoadingContacts.value = false;
+    }
+};
+
+// Modifikasi function untuk select contact
+const selectContact = (contact) => {
+    form.contact_name = contact.name; // Simpan contact name, bukan ID
+    contactQuery.value = contact.name;
+    contactSuggestions.value = [];
+};
+
+// Jika user mengetik langsung tanpa memilih dari sugesti
+const updateContactName = () => {
+    form.contact_name = contactQuery.value;
+};
+
+// Add new item row
+const addItem = () => {
+    form.items.push({
+        description: "",
+        quantity: 1,
+        price: 0,
+    });
+};
+
+// Remove item row
+const removeItem = (index) => {
+    if (form.items.length > 1) {
+        form.items.splice(index, 1);
+    }
+};
+
 // Submit form
 const submitForm = () => {
-    // Menggunakan Inertia untuk submit form
-    router.post(route("finance.customers.store"), form, {
+    // Update contact_name jika diisi manual
+    form.contact_name = contactQuery.value;
+
+    isSubmitting.value = true;
+    errors.value = {};
+
+    router.post(route("finance.transactions.store"), form, {
         forceFormData: true,
         onSuccess: () => {
-            // Redirect setelah berhasil (bisa dihandle oleh controller)
+            isSubmitting.value = false;
+            // Redirect handled by controller
         },
-        onError: (errors) => {
-            console.error("Form errors:", errors);
+        onError: (err) => {
+            isSubmitting.value = false;
+            errors.value = err;
+            console.error("Form errors:", err);
         },
     });
 };

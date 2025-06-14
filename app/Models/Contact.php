@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Supplier extends Model
+class Contact extends Model
 {
     use HasFactory;
 
@@ -16,19 +16,14 @@ class Supplier extends Model
      */
     protected $fillable = [
         'name',
+        'type',
         'email',
         'phone',
         'address',
-        'city',
-        'postal_code',
-        'contact_person',
-        'contact_phone',
+        'pic_name',
+        'pic_phone',
         'tax_id',
-        'bank_name',
         'bank_account',
-        'bank_account_name',
-        'payment_term',
-        'products_supplied',
         'notes',
         'status',
         'created_by',
@@ -36,7 +31,7 @@ class Supplier extends Model
     ];
 
     /**
-     * Get the user who created this supplier.
+     * Get the user who created this contact.
      */
     public function creator()
     {
@@ -44,7 +39,7 @@ class Supplier extends Model
     }
 
     /**
-     * Get the user who last updated this supplier.
+     * Get the user who last updated this contact.
      */
     public function editor()
     {
@@ -52,24 +47,22 @@ class Supplier extends Model
     }
 
     /**
-     * Get the transactions associated with this supplier.
+     * Get the transactions associated with this contact.
      */
     public function transactions()
     {
-        return $this->hasMany(Transaksi::class, 'contact_id')
-                    ->where('type', 'purchase');
+        return $this->hasMany(Transaksi::class, 'contact_id');
     }
 
     /**
-     * Scope untuk pencarian
+     * Scope untuk pencarian berdasarkan nama atau kontak
      */
     public function scopeSearch($query, $search)
     {
         if ($search) {
             return $query->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('products_supplied', 'like', "%{$search}%");
+                        ->orWhere('phone', 'like', "%{$search}%");
         }
         return $query;
     }
@@ -80,21 +73,5 @@ class Supplier extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
-    }
-
-    /**
-     * Get payment term text
-     */
-    public function getPaymentTermTextAttribute()
-    {
-        $terms = [
-            'cod' => 'Cash on Delivery',
-            'net7' => 'NET 7 Hari',
-            'net14' => 'NET 14 Hari',
-            'net30' => 'NET 30 Hari',
-            'net60' => 'NET 60 Hari',
-        ];
-
-        return $terms[$this->payment_term] ?? $this->payment_term;
     }
 }

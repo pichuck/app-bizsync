@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerController extends Controller
 {
@@ -15,37 +18,18 @@ class CustomerController extends Controller
             abort(403, 'Unauthorized access');
         }
         
-        // Data dummy customers - ganti dengan data dari database
-        $customers = [
-            [
-                'id' => 1,
-                'name' => 'PT. ABC Corporation',
-                'contact' => '0812-3456-7890',
-                'credit_limit' => 50000000,
-                'total_receivables' => 15000000,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id' => 2,
-                'name' => 'CV. XYZ Trading',
-                'contact' => '0821-9876-5432',
-                'credit_limit' => 25000000,
-                'total_receivables' => 22000000,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id' => 3,
-                'name' => 'Toko Makmur Jaya',
-                'contact' => '0856-1111-2222',
-                'credit_limit' => 10000000,
-                'total_receivables' => 3000000,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ];
-        
+        // Ambil data customers dari database dengan total receivables
+        $customers = Customer::select('id', 'name', 'phone', 'email', 'credit_limit', 'status')
+            ->withCount(['transactions as total_transactions' => function($query) {
+                $query->where('type', 'sale');
+            }])
+            ->withSum(['transactions as total_receivables' => function($query) {
+                $query->where('status', 'unpaid')
+                      ->where('payment_method', 'credit')
+                      ->where('type', 'sale');
+            }], 'total')
+            ->get();
+            
         return Inertia::render('Dashboard/Finance/Customers', [
             'user' => $user,
             'customers' => $customers,
@@ -84,49 +68,23 @@ class CustomerController extends Controller
             abort(403, 'Unauthorized access');
         }
         
-        // Data dummy customer untuk contoh
-        $customer = [
-            'id' => $id,
-            'name' => 'PT. ABC Corporation',
-            'contact' => '0812-3456-7890',
-            'email' => 'contact@abc-corp.com',
-            'address' => 'Jl. Sudirman No. 123, Jakarta',
-            'credit_limit' => 50000000,
-            'outstanding_balance' => 15000000,
-            'type' => 'company',
-            'status' => 'active',
-            'created_at' => '2023-01-15',
-            'updated_at' => '2024-05-20',
-            // Data transaksi dummy
-            'transactions' => [
-                [
-                    'id' => 101,
-                    'date' => '2024-05-15',
-                    'type' => 'sale',
-                    'description' => 'Penjualan Produk A',
-                    'total' => 5000000,
-                    'status' => 'paid',
-                    'payment_method' => 'credit'
-                ],
-                [
-                    'id' => 102,
-                    'date' => '2024-06-01',
-                    'type' => 'sale',
-                    'description' => 'Penjualan Produk B',
-                    'total' => 7500000,
-                    'status' => 'unpaid',
-                    'payment_method' => 'credit'
-                ]
-            ]
-        ];
-        
-        // Ubah path render ke Read.vue yang benar
+        // Ambil data customer dengan transaksi terkait
+        $customer = Customer::with(['transactions' => function($query) {
+                $query->latest('date')->limit(5);
+            }])
+            ->withSum(['transactions as outstanding_balance' => function($query) {
+                $query->where('status', 'unpaid')
+                      ->where('payment_method', 'credit')
+                      ->where('type', 'sale');
+            }], 'total')
+            ->findOrFail($id);
+            
         return Inertia::render('Dashboard/Finance/CRUDcustomer/Read', [
             'user' => $user,
             'customer' => $customer,
         ]);
     }
-
+    
     public function edit($id)
     {
         $user = auth()->user()->load('roles');

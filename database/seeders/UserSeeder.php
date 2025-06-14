@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
             'username' => 'admin',
             'password' => Hash::make('password123'),
             'phone' => '081234567891',
-            'status' => 'non-active', // Ubah status menjadi non-active
+            'status' => 'active', // Ubah status menjadi non-active
         ]);
         $admin->addRole('admin');
         echo "Admin created with role: " . $admin->roles->pluck('name')->join(', ') . "\n";

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Supplier extends Model
+class Customer extends Model
 {
     use HasFactory;
 
@@ -24,11 +24,8 @@ class Supplier extends Model
         'contact_person',
         'contact_phone',
         'tax_id',
-        'bank_name',
-        'bank_account',
-        'bank_account_name',
         'payment_term',
-        'products_supplied',
+        'credit_limit',
         'notes',
         'status',
         'created_by',
@@ -36,7 +33,16 @@ class Supplier extends Model
     ];
 
     /**
-     * Get the user who created this supplier.
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'credit_limit' => 'float',
+    ];
+
+    /**
+     * Get the user who created this customer.
      */
     public function creator()
     {
@@ -44,7 +50,7 @@ class Supplier extends Model
     }
 
     /**
-     * Get the user who last updated this supplier.
+     * Get the user who last updated this customer.
      */
     public function editor()
     {
@@ -52,12 +58,12 @@ class Supplier extends Model
     }
 
     /**
-     * Get the transactions associated with this supplier.
+     * Get the transactions associated with this customer.
      */
     public function transactions()
     {
         return $this->hasMany(Transaksi::class, 'contact_id')
-                    ->where('type', 'purchase');
+                    ->where('type', 'sale');
     }
 
     /**
@@ -68,8 +74,7 @@ class Supplier extends Model
         if ($search) {
             return $query->where('name', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('products_supplied', 'like', "%{$search}%");
+                        ->orWhere('phone', 'like', "%{$search}%");
         }
         return $query;
     }

@@ -1,8 +1,22 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+*/
+
+Route::middleware('auth:sanctum')->group(function () {
+    // API untuk search contacts
+    Route::get('/contacts/search', [TransactionController::class, 'searchContacts']);
+    
+    // API untuk mendapatkan semua customers untuk dropdown
+    Route::get('/customers', [TransactionController::class, 'getCustomers']);
+    
+    // API untuk mendapatkan semua suppliers untuk dropdown
+    Route::get('/suppliers', [TransactionController::class, 'getSuppliers']);
+});
